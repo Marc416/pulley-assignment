@@ -113,12 +113,13 @@ ex ) http://localhost:8080/piece
 REQUESTBODY
 {
 	자유롭게 구현하시면 됩니다.
-	"teacherId":3,
+	"pieceTitle":"pieceTitle",
 	"problemListIds":[1,3,2,4]
 }
 
 RESPONSEBODY
 {
+	"result": "SUCCESS",
 	"pieceId" :13
 }
 
@@ -235,16 +236,18 @@ RESPONSEBODY
 			"name":이름
 		}
 	],
-	"resultPerStudents":[
+	"resultsPerStudents":[
 		{
 			"studentId":3,
 			"correctRate": 33
 		}
 	]
-	"resultPerProblems":[
+	"resultsPerProblems":[
 		{
 			"problemId":1,
-			"correctRate": 33
+			"correctRate": 33,
+			"unitCode":"utc132",
+			"unitName":"모수와 통계량 구별, 모집단과 표본"
 		}
 	]
 	
