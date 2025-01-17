@@ -1,7 +1,5 @@
 package com.problem.application.repository
 
-import com.problem.domain.dto.problem.ProblemCondition
-import com.problem.domain.dto.problem.ProblemDto
 import com.problem.domain.dto.problem.ProblemType
 import com.problem.domain.entity.Problem
 import com.problem.domain.repository.ProblemRepository
@@ -15,16 +13,19 @@ import org.springframework.stereotype.Repository
 class ProblemRepositoryImpl(
     private val repository: JpaProblemRepositoryImpl
 ) : ProblemRepository {
-    override fun findProblemByCondition(condition: ProblemCondition): ProblemDto {
-        val result = condition.getProblemCountByLevel().map {
-            repository.findByUnitCodeInAndLevelInAndTypeIn(
-                condition.unitCodeList,
-                it.key.levels,
-                condition.problemType.getValue(),
-                PageRequest.of(0, it.value)
-            )
-        }.flatten()
-        return ProblemDto(result)
+
+    override fun findByUnitCodeInAndLevelInAndTypeIn(
+        count: Int,
+        unitCodeList: List<String>,
+        levels: List<Int>,
+        problemType: List<ProblemType>
+    ): List<Problem> {
+        return repository.findByUnitCodeInAndLevelInAndTypeIn(
+            unitCodeList,
+            levels,
+            problemType,
+            PageRequest.of(0, count)
+        )
     }
 }
 
