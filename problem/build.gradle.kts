@@ -20,9 +20,12 @@ repositories {
 }
 
 dependencies {
+    implementation("com.auth0:java-jwt:4.1.0")
     // kotlin-logging
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.2")
     implementation ("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.security:spring-security-config")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

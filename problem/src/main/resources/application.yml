@@ -23,4 +23,5 @@ spring:
       schema-locations:
         - classpath:sql/problem.sql
         - classpath:sql/unit_code.sql
+        - classpath:sql/piece.sql
       mode: always

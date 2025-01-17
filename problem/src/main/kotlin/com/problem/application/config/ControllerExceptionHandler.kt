@@ -4,18 +4,21 @@ import com.problem.application.controller.response.ApplicationExceptionResponse
 import com.problem.application.controller.response.ErrorResponse
 import com.problem.application.exception.ApplicationException
 import com.problem.application.exception.ErrorType
+import jakarta.validation.ValidationException
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import java.util.stream.Collectors
 
 val logger = KotlinLogging.logger {}
 
 @RestControllerAdvice
-class GlobalExceptionHandler {
+class ControllerExceptionHandler {
 
     @ExceptionHandler(ApplicationException::class)
     fun handleApplicationException(e: ApplicationException): ResponseEntity<ApplicationExceptionResponse> {
@@ -30,14 +33,27 @@ class GlobalExceptionHandler {
             )
     }
 
+    @ExceptionHandler(ValidationException::class)
+    fun handleValidationException(e: ValidationException): ResponseEntity<ErrorResponse> {
+        logger.error { "Validation Exception occurred. message=${e.message}" }
+        logger.error{e.stackTraceToString()}
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(
+                ErrorResponse(
+                    e.message ?: "알수없는 오류가 발생했습니다.",
+                    ErrorType.INVALID_REQUEST
+                )
+            )
+    }
+
     @ExceptionHandler(MissingServletRequestParameterException::class)
     fun handleMissingServletRequestParameterException(e: MissingServletRequestParameterException): ResponseEntity<ErrorResponse> {
         logger.error { "MissingServletRequestParameter Exception occurred. parameterName=${e.parameterName}, message=${e.message}" }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(
                 ErrorResponse(
-                    ErrorType.INVALID_PARAMETER.description,
-                    ErrorType.INVALID_PARAMETER
+                    e.message,
+                    ErrorType.INVALID_REQUEST
                 )
             )
     }
@@ -48,9 +64,20 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(
                 ErrorResponse(
-                    ErrorType.INVALID_PARAMETER.description,
-                    ErrorType.INVALID_PARAMETER
+                    createMessage(e) ?: "알수없는 오류가 발생했습니다.",
+                    ErrorType.INVALID_REQUEST
                 )
             )
     }
+
+    private fun createMessage(e: MethodArgumentNotValidException): String? {
+        if (e.fieldError != null && e.fieldError!!.defaultMessage != null) {
+            return e.fieldError!!.defaultMessage
+        }
+
+        return e.fieldErrors.stream()
+            .map { obj: FieldError -> obj.field }
+            .collect(Collectors.joining(", ")) + " 값들이 정확하지 않습니다."
+    }
+
 }
