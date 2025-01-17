@@ -5,8 +5,7 @@ CREATE TABLE problem
     level     INT                   NOT NULL COMMENT '난이도',
     type      VARCHAR(40)           NOT NULL COMMENT '문제 유형',
     answer    VARCHAR(100)          NOT NULL COMMENT '정답',
-    PRIMARY KEY (id),
-    CONSTRAINT uc_unit_code UNIQUE KEY (unit_code)
+    PRIMARY KEY (id)
 )
     COMMENT ='시험 문제'
     COLLATE = UTF8MB4_UNICODE_CI;
