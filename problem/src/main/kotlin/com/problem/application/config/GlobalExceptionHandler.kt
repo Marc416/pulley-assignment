@@ -1,6 +1,8 @@
 package com.problem.application.config
 
+import com.problem.application.controller.response.ApplicationExceptionResponse
 import com.problem.application.controller.response.ErrorResponse
+import com.problem.application.exception.ApplicationException
 import com.problem.application.exception.ErrorType
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
@@ -14,6 +16,20 @@ val logger = KotlinLogging.logger {}
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
+
+    @ExceptionHandler(ApplicationException::class)
+    fun handleApplicationException(e: ApplicationException): ResponseEntity<ApplicationExceptionResponse> {
+        logger.error { "Application Exception occurred. code=${e.code.name}, message=${e.message}" }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(
+                ApplicationExceptionResponse(
+                    message = e.message ?: "",
+                    code = e.code,
+                    data = e.data
+                )
+            )
+    }
+
     @ExceptionHandler(MissingServletRequestParameterException::class)
     fun handleMissingServletRequestParameterException(e: MissingServletRequestParameterException): ResponseEntity<ErrorResponse> {
         logger.error { "MissingServletRequestParameter Exception occurred. parameterName=${e.parameterName}, message=${e.message}" }
