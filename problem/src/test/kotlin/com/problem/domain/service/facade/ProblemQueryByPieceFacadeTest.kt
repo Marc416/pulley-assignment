@@ -97,7 +97,7 @@ class ProblemQueryByPieceFacadeTest {
     }
 
     @Test
-    fun `존재하지 않는 학습지인경우 예외발생`() {
+    fun `학생에게 지급되지 않은 학습지인경우 예외발생`() {
         // Arrange
         val teacherId = 1L
         val studentId = 2L
