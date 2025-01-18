@@ -4,6 +4,7 @@ import com.problem.application.common.httpresponse.CodeEnum
 import com.problem.application.exception.ApplicationException
 import com.problem.domain.dto.problem.ProblemCondition
 import com.problem.domain.dto.problem.ProblemDto
+import com.problem.domain.entity.Problem
 import com.problem.domain.repository.ProblemRepository
 import com.problem.domain.usecase.ProblemQueryUseCase
 import org.springframework.stereotype.Service
@@ -28,4 +29,9 @@ class ProblemQueryService(
         }
         return ProblemDto(result)
     }
+
+    override fun findByIds(ids: List<Long>): List<Problem> {
+        return problemRepository.findByIds(ids)
+    }
+
 }

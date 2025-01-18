@@ -10,4 +10,7 @@ interface ProblemRepository {
         levels: List<Int>,
         problemType: List<ProblemType>,
     ): List<Problem>
+
+    fun findByIds(ids: List<Long>): List<Problem>
+    fun save(problem: Problem): Problem
 }
