@@ -27,6 +27,14 @@ class ProblemRepositoryImpl(
             PageRequest.of(0, count)
         )
     }
+
+    override fun findByIds(ids: List<Long>): List<Problem> {
+        return repository.findByIds(ids)
+    }
+
+    override fun save(problem: Problem): Problem {
+        return repository.save(problem)
+    }
 }
 
 interface JpaProblemRepositoryImpl : JpaRepository<Problem, Long> {
@@ -37,4 +45,7 @@ interface JpaProblemRepositoryImpl : JpaRepository<Problem, Long> {
         type: List<ProblemType>,
         pageable: Pageable
     ): List<Problem>
+
+    @Query("SELECT p FROM Problem p WHERE p.id IN :ids")
+    fun findByIds(ids: List<Long>): List<Problem>
 }

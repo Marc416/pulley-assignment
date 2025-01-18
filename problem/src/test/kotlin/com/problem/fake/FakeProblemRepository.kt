@@ -19,4 +19,14 @@ class FakeProblemRepository : ProblemRepository {
                 problem.type in problemType
         }
     }
+
+    override fun findByIds(ids: List<Long>): List<Problem> {
+        return map.values.filter { it.id in ids }
+    }
+
+    override fun save(problem: Problem): Problem {
+        val id = map.size.toLong() + 1
+        map[id] = problem
+        return problem
+    }
 }

@@ -3,6 +3,7 @@ package com.problem.application.repository
 import com.problem.domain.entity.PiecePresentToStudent
 import com.problem.domain.repository.PiecePresentToStudentRepository
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -19,5 +20,6 @@ class PiecePresentToStudentRepositoryImpl(
 }
 
 interface JpaPiecePresentToStudentRepositoryImpl : JpaRepository<PiecePresentToStudent, Long> {
+    @Query("SELECT p FROM PiecePresentToStudent p WHERE p.pieceId = :pieceId AND p.studentId IN :studentIds AND p.deletedAt IS NULL")
     fun findByPieceIdAndStudentIdIn(pieceId: Long, studentIds: List<Long>): List<PiecePresentToStudent>
 }
