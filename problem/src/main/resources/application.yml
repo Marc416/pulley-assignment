@@ -24,4 +24,5 @@ spring:
         - classpath:sql/problem.sql
         - classpath:sql/unit_code.sql
         - classpath:sql/piece.sql
+        - classpath:sql/piece_present_to_student.sql
       mode: always
