@@ -8,6 +8,7 @@ import com.problem.domain.usecase.PieceTryHistoryCommandUseCase
 import com.problem.domain.usecase.ProblemQueryUseCase
 import com.problem.domain.usecase.facade.TryPieceByStudentCommandFacadeUseCase
 import org.springframework.stereotype.Service
+import kotlin.math.ceil
 
 @Service
 class TryPieceByStudentCommandFacade(
@@ -27,9 +28,16 @@ class TryPieceByStudentCommandFacade(
         pieceTryHistoryCommandUseCase.execute(
             pieceId = pieceId,
             studentId = studentId,
-            score = answerResults.count { it.isCorrect }
+            score = getScore(answerResults)
         )
         return answerResults
+    }
+
+    // 소수 첫째자리 올림
+    private fun getScore(answerResults: List<ProblemAnswerResult>): Int {
+        val percentage = answerResults.count { it.isCorrect }.toDouble() / answerResults.size * 100
+        val roundedUpPercentage = ceil(percentage * 10) / 10
+        return roundedUpPercentage.toInt().coerceAtMost(100)
     }
 
     private fun getProblemAnswerResult(
