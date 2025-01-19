@@ -86,7 +86,7 @@ class TryPieceByStudentCommandFacadeTest {
             )
         )
         // Action
-        val result = tryPieceByStudentCommandFacade.tryPiece(
+        val studentAnswerResult = tryPieceByStudentCommandFacade.tryPiece(
             studentId = studentId,
             pieceId = piece.id,
             studentAnswers = listOf(
@@ -97,6 +97,6 @@ class TryPieceByStudentCommandFacadeTest {
             )
         )
         // Assert
-        assertThat(result.first().isCorrect).isEqualTo(true)
+        assertThat(studentAnswerResult.first().isCorrect).isEqualTo(true)
     }
 }
