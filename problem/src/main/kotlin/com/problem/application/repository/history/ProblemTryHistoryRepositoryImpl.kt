@@ -4,14 +4,36 @@ import com.problem.domain.entity.history.ProblemTryHistory
 import com.problem.domain.repository.history.ProblemTryHistoryRepository
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 
 @Repository
 class ProblemTryHistoryRepositoryImpl(
-    private val repository: JpaProblemTryHistoryRepository
+    private val repository: JpaProblemTryHistoryRepository,
+    private val jdbcTemplate: JdbcTemplate
 ) : ProblemTryHistoryRepository {
     override fun save(problemTryHistory: ProblemTryHistory): ProblemTryHistory {
         return repository.save(problemTryHistory)
+    }
+
+    override fun saveAll(problemTryHistory: List<ProblemTryHistory>): List<ProblemTryHistory> {
+        val sql = """
+            INSERT INTO problem_try_history (problem_id, student_id, is_correct, ever_correct, created_at)
+            VALUES (?, ?, ?, ?, ?)
+        """
+
+        val batchArgs = problemTryHistory.map { history ->
+            arrayOf(
+                history.problemId,
+                history.studentId,
+                history.isCorrect,
+                history.everCorrect,
+                history.createdAt,
+            )
+        }
+
+        jdbcTemplate.batchUpdate(sql, batchArgs)
+        return problemTryHistory
     }
 
     override fun findByProblemIdAndStudentId(problemId: Long, studentId: Long): ProblemTryHistory? {

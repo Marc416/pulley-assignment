@@ -52,12 +52,12 @@ class TryPieceByStudentCommandFacadeTest {
         every { pieceTryHistoryCommandUseCase.execute(any(), any(), any()) } returns Unit
 
         val problemTryHistoryCommandUseCase = mockk<ProblemTryHistoryCommandUseCase>()
-        every { problemTryHistoryCommandUseCase.execute(any(), any(), any()) } returns ProblemTryHistory(
+        every { problemTryHistoryCommandUseCase.execute(any()) } returns listOf(ProblemTryHistory(
             problemId = 1L,
             studentId = 1L,
             isCorrect = true,
             everCorrect = true
-        )
+        ))
 
         tryPieceByStudentCommandFacade = TryPieceByStudentCommandFacade(
             pieceQueryUseCase = pieceQueryUseCase,

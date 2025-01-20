@@ -38,7 +38,7 @@ class ProblemRepositoryImpl(
 }
 
 interface JpaProblemRepositoryImpl : JpaRepository<Problem, Long> {
-    @Query("SELECT p FROM Problem p WHERE p.unitCode IN :unitCode AND p.level IN :level AND p.type IN :type ORDER BY p.unitCode, p.type, p.level")
+    @Query("SELECT p FROM Problem p WHERE p.unitCode IN :unitCode AND p.type IN :type AND p.level IN :level  ORDER BY p.unitCode, p.type, p.level")
     fun findByUnitCodeInAndLevelInAndTypeIn(
         unitCode: List<String>,
         level: List<Int>,

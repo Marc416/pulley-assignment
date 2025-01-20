@@ -1,5 +1,6 @@
 package com.problem.application.controller
 
+import com.problem.application.common.httpresponse.HttpApiResponse
 import com.problem.application.config.CustomUserDetails
 import com.problem.application.controller.response.ProblemQueryResponse
 import com.problem.domain.service.facade.ProblemQueryByPieceFacade
@@ -18,7 +19,12 @@ class PieceQueryController(
     fun findProblems(
         @RequestParam pieceId: Long,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ): ProblemQueryResponse {
-        return problemQueryByPieceFacade.findProblemDetailByPieceId(userDetails.user.userId, pieceId)
+    ): HttpApiResponse<ProblemQueryResponse> {
+        return HttpApiResponse.of(
+            problemQueryByPieceFacade.findProblemDetailByPieceId(
+                userDetails.user.userId,
+                pieceId
+            )
+        )
     }
 }

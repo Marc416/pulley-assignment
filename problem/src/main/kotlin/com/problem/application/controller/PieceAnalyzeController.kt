@@ -1,5 +1,6 @@
 package com.problem.application.controller
 
+import com.problem.application.common.httpresponse.HttpApiResponse
 import com.problem.application.config.CustomUserDetails
 import com.problem.application.controller.response.PieceAnalyzeResponse
 import com.problem.domain.usecase.facade.PieceAnalyzeFacadeUseCase
@@ -17,7 +18,7 @@ class PieceAnalyzeController(
     fun analyze(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
         @RequestParam pieceId: Long
-    ): PieceAnalyzeResponse {
-        return pieceAnalyzeFacadeUseCase.analyze(userDetails.user.userId, pieceId)
+    ): HttpApiResponse<PieceAnalyzeResponse> {
+        return HttpApiResponse.of(pieceAnalyzeFacadeUseCase.analyze(userDetails.user.userId, pieceId))
     }
 }

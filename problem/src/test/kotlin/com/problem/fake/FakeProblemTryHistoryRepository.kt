@@ -10,6 +10,11 @@ class FakeProblemTryHistoryRepository : ProblemTryHistoryRepository {
         return problemTryHistory
     }
 
+    override fun saveAll(problemTryHistory: List<ProblemTryHistory>): List<ProblemTryHistory> {
+        problemTryHistory.forEach { save(it) }
+        return problemTryHistory
+    }
+
     override fun findByProblemIdAndStudentId(problemId: Long, studentId: Long): ProblemTryHistory? {
         return map.values.find { it.problemId == problemId && it.studentId == studentId }
     }
