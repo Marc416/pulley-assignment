@@ -4,17 +4,13 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import java.time.LocalDateTime
 
 @Entity
-class PieceTryHistory(
-    val pieceId: Long,
-    val studentId: Long,
-    val score: Int,
-    val maxScore: Int,
-    val createdAt: LocalDateTime = LocalDateTime.now()
+class ProblemUnit(
+    val unitCode: String,
+    val name: String
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long = 0L
+    val id: Long = 0
 }

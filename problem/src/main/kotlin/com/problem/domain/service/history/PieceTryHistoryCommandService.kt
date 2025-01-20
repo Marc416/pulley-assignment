@@ -1,8 +1,8 @@
-package com.problem.domain.service
+package com.problem.domain.service.history
 
-import com.problem.domain.entity.PieceTryHistory
-import com.problem.domain.repository.PieceTryHistoryRepository
-import com.problem.domain.usecase.PieceTryHistoryCommandUseCase
+import com.problem.domain.entity.history.PieceTryHistory
+import com.problem.domain.repository.history.PieceTryHistoryRepository
+import com.problem.domain.usecase.history.PieceTryHistoryCommandUseCase
 import org.springframework.stereotype.Service
 import kotlin.math.max
 

@@ -5,15 +5,17 @@ import com.problem.domain.dto.problem.ProblemType
 import com.problem.domain.entity.Piece
 import com.problem.domain.entity.PiecePresentToStudent
 import com.problem.domain.entity.Problem
+import com.problem.domain.entity.history.ProblemTryHistory
 import com.problem.domain.repository.PiecePresentToStudentRepository
 import com.problem.domain.repository.PieceRepository
 import com.problem.domain.repository.ProblemRepository
 import com.problem.domain.service.PieceQueryService
 import com.problem.domain.service.ProblemQueryService
 import com.problem.domain.usecase.PieceQueryUseCase
-import com.problem.domain.usecase.PieceTryHistoryCommandUseCase
+import com.problem.domain.usecase.history.PieceTryHistoryCommandUseCase
 import com.problem.domain.usecase.ProblemQueryUseCase
 import com.problem.domain.usecase.facade.TryPieceByStudentCommandFacadeUseCase
+import com.problem.domain.usecase.history.ProblemTryHistoryCommandUseCase
 import com.problem.fake.FakePiecePresentToStudentRepository
 import com.problem.fake.FakePieceRepository
 import com.problem.fake.FakeProblemRepository
@@ -49,10 +51,19 @@ class TryPieceByStudentCommandFacadeTest {
         val pieceTryHistoryCommandUseCase = mockk<PieceTryHistoryCommandUseCase>()
         every { pieceTryHistoryCommandUseCase.execute(any(), any(), any()) } returns Unit
 
+        val problemTryHistoryCommandUseCase = mockk<ProblemTryHistoryCommandUseCase>()
+        every { problemTryHistoryCommandUseCase.execute(any(), any(), any()) } returns ProblemTryHistory(
+            problemId = 1L,
+            studentId = 1L,
+            isCorrect = true,
+            everCorrect = true
+        )
+
         tryPieceByStudentCommandFacade = TryPieceByStudentCommandFacade(
             pieceQueryUseCase = pieceQueryUseCase,
             problemQueryUseCase = problemQueryUseCase,
-            pieceTryHistoryCommandUseCase = pieceTryHistoryCommandUseCase
+            pieceTryHistoryCommandUseCase = pieceTryHistoryCommandUseCase,
+            problemTryHistoryCommandUseCase = problemTryHistoryCommandUseCase
         )
     }
 

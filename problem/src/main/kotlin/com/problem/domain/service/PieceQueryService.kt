@@ -19,6 +19,10 @@ class PieceQueryService(
 
     }
 
+    override fun findByTeacherIdAndPieceId(teacherId: Long, pieceId: Long): Piece {
+        return pieceRepository.findByTeacherIdAndPieceId(teacherId, pieceId)
+    }
+
     private fun findById(pieceId: Long): Piece {
         return pieceRepository.findById(pieceId)
     }

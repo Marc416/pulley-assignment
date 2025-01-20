@@ -18,3 +18,5 @@ INSERT INTO piece_present_to_student
 VALUES (2, 2, 1, 1, '2025-01-18 09:04:40.11134', null);
 INSERT INTO piece_present_to_student
 VALUES (3, 2, 2, 1, '2025-01-18 09:04:40.11134', null);
+INSERT INTO piece_present_to_student
+VALUES (4, 1, 2, 1, '2025-01-18 09:04:40.11134', null);

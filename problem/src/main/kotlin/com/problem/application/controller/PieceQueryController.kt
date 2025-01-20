@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 class PieceQueryController(
     private val problemQueryByPieceFacade: ProblemQueryByPieceFacade
 ) {
-    @GetMapping("problems")
+    @GetMapping("/problems")
     fun findProblems(
         @RequestParam pieceId: Long,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
