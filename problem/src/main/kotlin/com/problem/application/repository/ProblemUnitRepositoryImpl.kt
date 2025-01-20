@@ -10,6 +10,10 @@ import org.springframework.stereotype.Repository
 class ProblemUnitRepositoryImpl(
     private val repository: JpaProblemUnitRepository
 ) : ProblemUnitRepository {
+    override fun save(problemUnit: ProblemUnit): ProblemUnit {
+        return repository.save(problemUnit)
+    }
+
     override fun findByUnitCodes(unitCodes: List<String>): List<ProblemUnit> {
         return repository.findByUnitCodes(unitCodes)
     }

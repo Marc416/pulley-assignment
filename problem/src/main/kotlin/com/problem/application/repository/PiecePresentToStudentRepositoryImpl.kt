@@ -5,6 +5,7 @@ import com.problem.domain.repository.PiecePresentToStudentRepository
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 
 @Repository
 class PiecePresentToStudentRepositoryImpl(
@@ -14,6 +15,7 @@ class PiecePresentToStudentRepositoryImpl(
         return repository.findByPieceIdAndStudentIdIn(pieceId, studentIds)
     }
 
+    @Transactional
     override fun saveAll(piecePresentToStudent: List<PiecePresentToStudent>): List<PiecePresentToStudent> {
         return repository.saveAll(piecePresentToStudent)
     }
