@@ -1,9 +1,8 @@
 package com.problem.application.config
 
-import com.problem.application.controller.response.ApplicationExceptionResponse
-import com.problem.application.controller.response.ErrorResponse
+import com.problem.application.common.httpresponse.CodeEnum
+import com.problem.application.common.httpresponse.HttpApiResponse
 import com.problem.application.exception.ApplicationException
-import com.problem.application.exception.ErrorType
 import jakarta.validation.ValidationException
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
@@ -21,58 +20,59 @@ val logger = KotlinLogging.logger {}
 class ControllerExceptionHandler {
 
     @ExceptionHandler(ApplicationException::class)
-    fun handleApplicationException(e: ApplicationException): ResponseEntity<ApplicationExceptionResponse> {
+    fun handleApplicationException(e: ApplicationException): ResponseEntity<HttpApiResponse<*>> {
         logger.error { "Application Exception occurred. code=${e.code.name}, message=${e.message}" }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(
-                ApplicationExceptionResponse(
-                    message = e.message ?: "",
+                HttpApiResponse.fromExceptionMessage(
                     code = e.code,
-                    data = e.data
+                    message = e.message ?: "",
+                    data = e.data ?: emptyMap()
                 )
             )
     }
 
     @ExceptionHandler(ValidationException::class)
-    fun handleValidationException(e: ValidationException): ResponseEntity<ErrorResponse> {
+    fun handleValidationException(e: ValidationException): ResponseEntity<HttpApiResponse<*>> {
         logger.error { "Validation Exception occurred. message=${e.message}" }
         logger.error { e.stackTraceToString() }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(
-                ErrorResponse(
-                    e.message ?: "알수없는 오류가 발생했습니다.",
-                    ErrorType.INVALID_REQUEST
+                HttpApiResponse.fromExceptionMessage(
+                    code = CodeEnum.FRS_003,
+                    message = CodeEnum.FRS_003.description + "| " + e.message
                 )
             )
     }
 
     @ExceptionHandler(MissingServletRequestParameterException::class)
-    fun handleMissingServletRequestParameterException(e: MissingServletRequestParameterException): ResponseEntity<ErrorResponse> {
+    fun handleMissingServletRequestParameterException(e: MissingServletRequestParameterException): ResponseEntity<HttpApiResponse<*>> {
         logger.error { "MissingServletRequestParameter Exception occurred. parameterName=${e.parameterName}, message=${e.message}" }
+        logger.error { e.stackTraceToString() }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(
-                ErrorResponse(
-                    e.message,
-                    ErrorType.INVALID_REQUEST
+                HttpApiResponse.fromExceptionMessage(
+                    code = CodeEnum.FRS_003,
+                    message = e.message
                 )
             )
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
+    fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<HttpApiResponse<*>> {
         logger.error { "MethodArgumentNotValidException Exception occurred. message=${e.message}" }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(
-                ErrorResponse(
-                    createMessage(e) ?: "알수없는 오류가 발생했습니다.",
-                    ErrorType.INVALID_REQUEST
+                HttpApiResponse.fromExceptionMessage(
+                    code = CodeEnum.FRS_003,
+                    message = createMessage(e)
                 )
             )
     }
 
-    private fun createMessage(e: MethodArgumentNotValidException): String? {
+    private fun createMessage(e: MethodArgumentNotValidException): String {
         if (e.fieldError != null && e.fieldError!!.defaultMessage != null) {
-            return e.fieldError!!.defaultMessage
+            return e.fieldError!!.defaultMessage ?: "알수없는 오류가 발생했습니다."
         }
 
         return e.fieldErrors.stream()
@@ -81,14 +81,14 @@ class ControllerExceptionHandler {
     }
 
     @ExceptionHandler(Exception::class)
-    fun handleException(e: Exception): ResponseEntity<ErrorResponse> {
+    fun handleException(e: Exception): ResponseEntity<HttpApiResponse<*>> {
         logger.error { "Exception occurred. message=${e.message}" }
         logger.error { e.stackTraceToString() }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(
-                ErrorResponse(
-                    e.message ?: "알수없는 오류가 발생했습니다.",
-                    ErrorType.UNKNOWN
+                HttpApiResponse.fromExceptionMessage(
+                    code = CodeEnum.FRS_004,
+                    message = CodeEnum.FRS_004.description + "| " + e.message
                 )
             )
     }

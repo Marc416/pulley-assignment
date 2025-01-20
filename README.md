@@ -112,7 +112,6 @@ ex ) http://localhost:8080/piece
 
 REQUESTBODY
 {
-	자유롭게 구현하시면 됩니다.
 	"pieceTitle":"pieceTitle",
 	"problemListIds":[1,3,2,4]
 }
@@ -144,8 +143,8 @@ REQUESTBODY
 
 RESPONSEBODY
 {
-	"received":[1,3],
-	"exist":[4]
+	"receivedStudents":[1,3],
+	"existStudents":[4]
 }
 
 ```
@@ -193,19 +192,26 @@ REQUEST
 ex ) http://localhost:8080/piece/problems?pieceId=1
 
 REQUESTBODY
-{
-	"problemIds":[1,3]
-}
+[
+	{
+		"problemId": 1,
+		"answer": "hello",
+	},
+	{
+		"problemId": 3,
+		"answer": 3,
+	},
+]
 
 RESPONSEBODY
 [
 	{
-			"id" :1,
-			"result": true
+			"problemId" :1,
+			"isCorrect": true
 	},
 	{
-			"id" :3,
-			"result": false
+			"problemId" :3,
+			"isCorrect": false
 	},
 ]
 ```
@@ -228,7 +234,7 @@ ex ) http://localhost:8080/piece/analyze?pieceId=1
 
 RESPONSEBODY
 {
-	"id": 13,
+	"pieceId": 13,
 	"title":"pieceTitle",
 	"students":[
 		{
@@ -270,4 +276,264 @@ RESPONSEBODY
 
 ```
 위의 내용은 모두 README에 작성해주시면 됩니다.
+```
+
+---
+
+# ERD
+![Image](https://github.com/user-attachments/assets/d430b18d-1f52-441d-9a6a-4ea8f6a2348f)
+
+## 프로젝트에서 발생할 수 있는 위험요소, 그리고 이를 어떻게 해결할지에 대해서 정리한 내용
+**1. 다량의 데이터가 적재된 통계성 데이터를 동시에 여러번 요청한 경우 DB 부하가 있을 수 있습니다**  
+- 빠른 조회를 위해 인덱스를 지정해서 조회속도를 높일 수 있습니다.
+- 통계성데이터 조회전용 캐시용테이블을 만들어서 조회속도를 높일 수 있습니다.
+- 레디스 등 캐시서버를 이용해서 조회속도를 높일 수 있습니다.
+
+**2. 점수체계가 변경이되어 100점만점이 아니게된경우**
+- 어떤 점수체계를 썼는지에 대한 전략용 컬럼이 추가되고 이것을 비지니스로직에서 풀어줘야 합니다.
+
+**3. 정답이 복수인경우**
+- 현재는 단일정답만을 가정하고 있습니다. 만일 복수정답이 발생한 경우 answer Column 을 List<String>으로 변경해야 합니다.
+- 복수 정답 모두 맞아야 하는 경우, 둘중 하나만 맞아도 되는 경우등의 비지니스 로직이 필요할 수 있습니다.  
+
+## 발생할 수 있는 문제와 이에 대한 해결책(비용측면 또는 성능 측면등)
+
+**1. 많은 학생들에게 문제지를 동시에 배급을 해야 하는 경우**
+- 쓰레드풀이 부족해 질 수 있습니다. 이때는 쓰레드풀을 늘려야 할 텐데 서비스에 사용되는 인스턴스의 동시 가용 쓰레드수를 확인합니다.  
+같은 사이즈의 인스턴스를 더 띄우거나, 인스턴스 사이즈를 늘려야 합니다.
+- 충분히 쓰레드풀을 늘렸음에도 서버오류가 발생할 수 있는데 이는 DB커넥션풀 부족일 수 있습니다. 모니터링을 꾸준히 하면서 커넥션풀이 여유가 있는지에 대한 확인이 필요합니다. 
+해결 책으로 DB 커넥션풀을 늘리거나 DB 클러스터를 늘리는 방법을 사용할 수 있습니다.
+- 자원 부족이 일어날지에 대한 모니터링을 위해 적절한 APM도구가 필요합니다.
+
+**2. 생성되어지는 로그성 데이터가 많아 질 예정**
+- 파티션 키를 설정하여 데이터베이스 또는 테이블 수준에서 데이터를 분산 저장합니다. 예를 들어, 날짜, 문제지 ID 또는 로그 유형 등을 파티션 키로 사용하여 데이터를 효율적으로 분리하고 관리할 수 있습니다.
+또한 파티션키를 잘 설정한다면 쿼리 성능도 향상될 수 있습니다.
+
+---
+# 요청예시
+### 문제지생성
+```
+POST http://localhost:8080/piece
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJURUFDSEVSIn0.OBY5iuemZl-F1Qc5Wp1gxRCIr_gefYHm6YfbS5o8u0g
+{
+  "pieceTitle":"pieceTitle",
+  "problemListIds":[12]
+}
+
+RESPONSE
+{
+  "code": "RS_000",
+  "message": null,
+  "data": {
+          "pieceId": 5
+          }
+  }
+}
+```
+### 학생에게 문제지 부여
+```
+POST http://localhost:8080/piece/2?studentIds=5,1,3
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJURUFDSEVSIn0.OBY5iuemZl-F1Qc5Wp1gxRCIr_gefYHm6YfbS5o8u0g
+
+RESPONSE
+{
+    "code": "RS_000",
+    "message": null,
+    "data": {
+        "receivedStudents": [
+            5,
+            3
+        ],
+        "existStudents": [
+            1
+        ]
+    }
+}
+```
+
+### 학생이 지급된 문제지의 문제조회
+```
+GET http://localhost:8080/piece/problems?pieceId=2
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJTVFVERU5UIn0.Uhj_0xSBxhQTXQBao2zgsUuHOtHjeQcbCDTHGff0Mfc
+
+RESPONSE
+{
+    "code": "RS_000",
+    "message": null,
+    "data": {
+        "pieceId": 2,
+        "pieceTitle": "3학년중간고사 국어 문제지",
+        "problems": [
+            {
+                "id": 1003,
+                "title": "원의 넓이를 구하는 공식을 고르시오",
+                "type": "SELECTION",
+                "selections": {
+                    "1": "Option 1 for problem 1003",
+                    "2": "Option 2 for problem 1003",
+                    "3": "Option 3 for problem 1003",
+                    "4": "Option 4 for problem 1003"
+                }
+            },
+            {
+                "id": 1004,
+                "title": "원뿔의 넓이를 구하는 공식을 고르시오",
+                "type": "SELECTION",
+                "selections": {
+                    "1": "Option 1 for problem 1004",
+                    "2": "Option 2 for problem 1004",
+                    "3": "Option 3 for problem 1004",
+                    "4": "Option 4 for problem 1004"
+                }
+            },
+            {
+                "id": 1005,
+                "title": "문제제목1005",
+                "type": "SELECTION",
+                "selections": {
+                    "1": "Option 1 for problem 1005",
+                    "2": "Option 2 for problem 1005",
+                    "3": "Option 3 for problem 1005",
+                    "4": "Option 4 for problem 1005"
+                }
+            },
+            {
+                "id": 1006,
+                "title": "문제제목1006",
+                "type": "SELECTION",
+                "selections": {
+                    "1": "Option 1 for problem 1006",
+                    "2": "Option 2 for problem 1006",
+                    "3": "Option 3 for problem 1006",
+                    "4": "Option 4 for problem 1006"
+                }
+            }
+        ]
+    }
+}
+```
+
+### 학생이 문제지 채점하기
+```
+PUT http://localhost:8080/piece/problems?pieceId=2
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJTVFVERU5UIn0.Uhj_0xSBxhQTXQBao2zgsUuHOtHjeQcbCDTHGff0Mfc
+[
+	{
+		"problemId": 1003,
+		"answer": 1
+	},
+	{
+		"problemId": 1004,
+		"answer": 2
+	},
+    	{
+		"problemId": 1005,
+		"answer": 1
+	},
+    	{
+		"problemId": 1006,
+		"answer": 1
+	}
+]
+
+RESPONSE
+{
+    "code": "RS_000",
+    "message": null,
+    "data": [
+        {
+            "problemId": 1003,
+            "isCorrect": true
+        },
+        {
+            "problemId": 1004,
+            "isCorrect": true
+        },
+        {
+            "problemId": 1005,
+            "isCorrect": false
+        },
+        {
+            "problemId": 1006,
+            "isCorrect": false
+        }
+    ]
+}
+```
+
+### 학습지 통계 조회
+```
+GET http://localhost:8080/piece/analyze?pieceId=2
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJURUFDSEVSIn0.OBY5iuemZl-F1Qc5Wp1gxRCIr_gefYHm6YfbS5o8u0g
+
+RESPONSE
+{
+    "code": "RS_000",
+    "message": null,
+    "data": {
+        "pieceId": 2,
+        "title": "3학년중간고사 국어 문제지",
+        "students": [
+            {
+                "id": 1,
+                "name": "임시이름1"
+            },
+            {
+                "id": 2,
+                "name": "임시이름2"
+            },
+            {
+                "id": 5,
+                "name": "임시이름5"
+            },
+            {
+                "id": 3,
+                "name": "임시이름3"
+            }
+        ],
+        "resultsPerStudents": [
+            {
+                "studentId": 1,
+                "correctRate": 50
+            }
+        ],
+        "resultsPerProblems": [
+            {
+                "problemId": 1003,
+                "correctRate": 25,
+                "unitCode": "uc1580",
+                "unitName": "표본추출 : 단순랜덤추출"
+            },
+            {
+                "problemId": 1004,
+                "correctRate": 25,
+                "unitCode": "uc1580",
+                "unitName": "표본추출 : 단순랜덤추출"
+            },
+            {
+                "problemId": 1005,
+                "correctRate": 0,
+                "unitCode": "uc1580",
+                "unitName": "표본추출 : 단순랜덤추출"
+            },
+            {
+                "problemId": 1006,
+                "correctRate": 0,
+                "unitCode": "uc1581",
+                "unitName": "표본추출 : 계통추출법"
+            }
+        ]
+    }
+}
+```
+
+### 권한이 없는경우
+```
+GET http://localhost:8080/piece/analyze?pieceId=2
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJTVFVERU5UIn0.Uhj_0xSBxhQTXQBao2zgsUuHOtHjeQcbCDTHGff0Mfc
+{
+    "code": "FRS_002",
+    "message": "Access Denied: You do not have the required role",
+    "data": null
+}
 ```

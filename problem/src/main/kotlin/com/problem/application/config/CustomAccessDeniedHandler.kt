@@ -2,7 +2,7 @@ package com.problem.application.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.problem.application.common.httpresponse.CodeEnum
-import com.problem.application.controller.response.ApplicationExceptionResponse
+import com.problem.application.common.httpresponse.HttpApiResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
@@ -18,7 +18,7 @@ class CustomAccessDeniedHandler : AccessDeniedHandler {
         response: HttpServletResponse,
         accessDeniedException: AccessDeniedException
     ) {
-        val errorResponse = ApplicationExceptionResponse(
+        val errorResponse = HttpApiResponse(
             message = "Access Denied: You do not have the required role",
             code = CodeEnum.FRS_002,
             data = null

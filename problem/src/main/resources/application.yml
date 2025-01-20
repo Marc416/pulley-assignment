@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8080
 
 spring:
   profiles:
@@ -23,7 +23,7 @@ spring:
     init:
       schema-locations:
         - classpath:sql/problem.sql
-        - classpath:sql/unit_code.sql
+        - classpath:sql/problem_unit.sql
         - classpath:sql/piece.sql
         - classpath:sql/piece_present_to_student.sql
         - classpath:sql/problem_detail.sql

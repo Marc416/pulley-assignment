@@ -1,6 +1,7 @@
 package com.problem.domain.service.facade
 
 import com.problem.application.controller.request.ProblemAnswer
+import com.problem.domain.dto.AnswerTryDto
 import com.problem.domain.dto.problem.ProblemAnswerResult
 import com.problem.domain.entity.Problem
 import com.problem.domain.usecase.PieceQueryUseCase
@@ -41,13 +42,8 @@ class TryPieceByStudentCommandFacade(
     }
 
     private fun executeProblemTryHistory(studentId: Long, answerResults: List<ProblemAnswerResult>) {
-        answerResults.forEach {
-            problemTryHistoryCommandUseCase.execute(
-                problemId = it.problemId,
-                studentId = studentId,
-                isCorrect = it.isCorrect
-            )
-        }
+        val studentAnswerDtos = answerResults.map { AnswerTryDto(it.problemId,studentId, it.isCorrect) }
+        problemTryHistoryCommandUseCase.execute(studentAnswerDtos)
     }
 
     // 소수 첫째자리 올림

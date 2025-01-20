@@ -1,5 +1,6 @@
 package com.problem.application.controller
 
+import com.problem.application.common.httpresponse.HttpApiResponse
 import com.problem.application.config.CustomUserDetails
 import com.problem.application.controller.request.CreatePieceRequest
 import com.problem.application.controller.request.ProblemAnswer
@@ -22,13 +23,13 @@ class PieceCommandController(
     fun createPiece(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
         @Valid @RequestBody request: CreatePieceRequest
-    ): PieceCommandResponse {
+    ): HttpApiResponse<PieceCommandResponse> {
         val piece = pieceCommandService.create(
             title = request.pieceTitle,
             problemList = request.problemListIds,
             teacherId = userDetails.user.userId
         )
-        return PieceCommandResponse(pieceId = piece.id)
+        return HttpApiResponse.of(PieceCommandResponse(pieceId = piece.id))
     }
 
     @PostMapping("/{pieceId}")
@@ -36,11 +37,13 @@ class PieceCommandController(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
         @PathVariable pieceId: Long,
         @RequestParam studentIds: List<Long>,
-    ): PresentPieceResponse {
-        return pieceCommandService.presentPieceToStudents(
-            pieceId = pieceId,
-            studentIds = studentIds,
-            teacherId = userDetails.user.userId
+    ): HttpApiResponse<PresentPieceResponse> {
+        return HttpApiResponse.of(
+            pieceCommandService.presentPieceToStudents(
+                pieceId = pieceId,
+                studentIds = studentIds,
+                teacherId = userDetails.user.userId
+            )
         )
     }
 
@@ -49,11 +52,13 @@ class PieceCommandController(
         @RequestParam pieceId: Long,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
         @RequestBody studentAnswers: List<ProblemAnswer>
-    ): List<ProblemAnswerResult> {
-        return tryPieceByStudentCommandFacadeUseCase.tryPiece(
-            studentId = userDetails.user.userId,
-            pieceId = pieceId,
-            studentAnswers = studentAnswers
+    ): HttpApiResponse<List<ProblemAnswerResult>> {
+        return HttpApiResponse.of(
+            tryPieceByStudentCommandFacadeUseCase.tryPiece(
+                studentId = userDetails.user.userId,
+                pieceId = pieceId,
+                studentAnswers = studentAnswers
+            )
         )
     }
 }
