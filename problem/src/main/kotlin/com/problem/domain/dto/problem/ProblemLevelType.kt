@@ -7,6 +7,9 @@ enum class ProblemLevelType(val description: String, val levels: List<Int>) {
     MIDDLE("중", listOf(2, 3, 4)),
     HIGH("상", listOf(5));
 
+    /**
+     * 레벨에 따라 문제를 배분할 때 수의 차이가 나는 부분들은 가장 문제수가 많이 있을 Middle레벨로 그 차이를 보정한다.
+     */
     fun getProblemCountByLevel(count: Int): Map<ProblemLevelType, Int> {
         val predictedValue = getPredictedCountPerProblemLevel(count)
         if (predictedValue.values.sum() != count) {
@@ -18,7 +21,7 @@ enum class ProblemLevelType(val description: String, val levels: List<Int>) {
 
     private fun getPredictedCountPerProblemLevel(count: Int): MutableMap<ProblemLevelType, Int> {
         return when (this) {
-            LOW -> return mutableMapOf(
+            HIGH -> return mutableMapOf(
                 LOW to ceil(count * 0.2).toInt(),
                 MIDDLE to ceil(count * 0.3).toInt(),
                 HIGH to ceil(count * 0.5).toInt()
@@ -30,7 +33,7 @@ enum class ProblemLevelType(val description: String, val levels: List<Int>) {
                 HIGH to ceil(count * 0.25).toInt()
             )
 
-            HIGH -> return mutableMapOf(
+            LOW -> return mutableMapOf(
                 LOW to ceil(count * 0.5).toInt(),
                 MIDDLE to ceil(count * 0.3).toInt(),
                 HIGH to ceil(count * 0.2).toInt()
