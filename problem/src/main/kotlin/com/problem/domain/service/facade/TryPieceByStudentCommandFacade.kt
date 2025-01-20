@@ -4,8 +4,9 @@ import com.problem.application.controller.request.ProblemAnswer
 import com.problem.domain.dto.problem.ProblemAnswerResult
 import com.problem.domain.entity.Problem
 import com.problem.domain.usecase.PieceQueryUseCase
-import com.problem.domain.usecase.PieceTryHistoryCommandUseCase
+import com.problem.domain.usecase.history.PieceTryHistoryCommandUseCase
 import com.problem.domain.usecase.ProblemQueryUseCase
+import com.problem.domain.usecase.history.ProblemTryHistoryCommandUseCase
 import com.problem.domain.usecase.facade.TryPieceByStudentCommandFacadeUseCase
 import org.springframework.stereotype.Service
 import kotlin.math.ceil
@@ -14,7 +15,8 @@ import kotlin.math.ceil
 class TryPieceByStudentCommandFacade(
     private val pieceQueryUseCase: PieceQueryUseCase,
     private val problemQueryUseCase: ProblemQueryUseCase,
-    private val pieceTryHistoryCommandUseCase: PieceTryHistoryCommandUseCase
+    private val pieceTryHistoryCommandUseCase: PieceTryHistoryCommandUseCase,
+    private val problemTryHistoryCommandUseCase: ProblemTryHistoryCommandUseCase
 ) : TryPieceByStudentCommandFacadeUseCase {
     override fun tryPiece(
         studentId: Long,
@@ -25,12 +27,27 @@ class TryPieceByStudentCommandFacade(
 
         val problemsAndAnswers = problemQueryUseCase.findByIds(piece.problems)
         val answerResults = getProblemAnswerResult(problemsAndAnswers, studentAnswers)
+        executePieceTryHistory(studentId, pieceId, getScore(answerResults))
+        executeProblemTryHistory(studentId, answerResults)
+        return answerResults
+    }
+
+    private fun executePieceTryHistory(studentId: Long, pieceId: Long, score: Int) {
         pieceTryHistoryCommandUseCase.execute(
             pieceId = pieceId,
             studentId = studentId,
-            score = getScore(answerResults)
+            score = score
         )
-        return answerResults
+    }
+
+    private fun executeProblemTryHistory(studentId: Long, answerResults: List<ProblemAnswerResult>) {
+        answerResults.forEach {
+            problemTryHistoryCommandUseCase.execute(
+                problemId = it.problemId,
+                studentId = studentId,
+                isCorrect = it.isCorrect
+            )
+        }
     }
 
     // 소수 첫째자리 올림

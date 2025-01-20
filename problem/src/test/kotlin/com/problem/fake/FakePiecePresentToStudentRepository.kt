@@ -14,5 +14,9 @@ class FakePiecePresentToStudentRepository : PiecePresentToStudentRepository {
         return piecePresentToStudent
     }
 
+    override fun findByTeacherIdAndPieceId(teacherId: Long, pieceId: Long): List<PiecePresentToStudent> {
+        return map.values.filter { it.teacherId == teacherId && it.pieceId == pieceId }
+    }
+
 
 }

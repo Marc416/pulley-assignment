@@ -1,7 +1,5 @@
 package com.problem.application.repository
 
-import com.problem.application.common.httpresponse.CodeEnum
-import com.problem.application.exception.ApplicationException
 import com.problem.domain.entity.ProblemDetail
 import com.problem.domain.repository.ProblemDetailRepository
 import org.springframework.data.jpa.repository.JpaRepository

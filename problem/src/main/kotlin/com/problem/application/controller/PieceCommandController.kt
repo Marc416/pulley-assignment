@@ -1,6 +1,7 @@
 package com.problem.application.controller
 
 import com.problem.application.config.CustomUserDetails
+import com.problem.application.controller.request.CreatePieceRequest
 import com.problem.application.controller.request.ProblemAnswer
 import com.problem.application.controller.response.PieceCommandResponse
 import com.problem.application.controller.response.PresentPieceResponse
@@ -8,7 +9,6 @@ import com.problem.domain.dto.problem.ProblemAnswerResult
 import com.problem.domain.service.PieceCommandService
 import com.problem.domain.usecase.facade.TryPieceByStudentCommandFacadeUseCase
 import jakarta.validation.Valid
-import jakarta.validation.constraints.Size
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
@@ -57,9 +57,3 @@ class PieceCommandController(
         )
     }
 }
-
-data class CreatePieceRequest(
-    val pieceTitle: String,
-    @field:Valid @field:Size(max = 50, message = "problemListIds size must be less than 50")
-    val problemListIds: List<Long>,
-)

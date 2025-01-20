@@ -5,21 +5,38 @@ import com.problem.domain.repository.PiecePresentToStudentRepository
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import org.springframework.jdbc.core.JdbcTemplate
 
 @Repository
 class PiecePresentToStudentRepositoryImpl(
-    private val repository: JpaPiecePresentToStudentRepositoryImpl
+    private val repository: JpaPiecePresentToStudentRepositoryImpl,
+    private val jdbcTemplate: JdbcTemplate,
 ) : PiecePresentToStudentRepository {
     override fun findByPieceIdAndStudentIds(pieceId: Long, studentIds: List<Long>): List<PiecePresentToStudent> {
         return repository.findByPieceIdAndStudentIdIn(pieceId, studentIds)
     }
 
     override fun saveAll(piecePresentToStudent: List<PiecePresentToStudent>): List<PiecePresentToStudent> {
-        return repository.saveAll(piecePresentToStudent)
+        val sql = "INSERT INTO piece_present_to_student (piece_id, student_id, teacher_id, created_at) VALUES (?, ?, ?,?)"
+
+        val batchArgs = piecePresentToStudent.map { piece ->
+            arrayOf(piece.pieceId, piece.studentId, piece.teacherId, piece.createdAt)
+        }
+
+        jdbcTemplate.batchUpdate(sql, batchArgs)
+        return piecePresentToStudent
+    }
+
+    override fun findByTeacherIdAndPieceId(teacherId: Long, pieceId: Long): List<PiecePresentToStudent> {
+        return repository.findByTeacherIdAndPieceId(teacherId, pieceId)
     }
 }
 
 interface JpaPiecePresentToStudentRepositoryImpl : JpaRepository<PiecePresentToStudent, Long> {
     @Query("SELECT p FROM PiecePresentToStudent p WHERE p.pieceId = :pieceId AND p.studentId IN :studentIds AND p.deletedAt IS NULL")
     fun findByPieceIdAndStudentIdIn(pieceId: Long, studentIds: List<Long>): List<PiecePresentToStudent>
+
+    @Query("SELECT p FROM PiecePresentToStudent p WHERE p.teacherId = :teacherId AND p.pieceId = :pieceId AND p.deletedAt IS NULL")
+    fun findByTeacherIdAndPieceId(teacherId: Long, pieceId: Long): List<PiecePresentToStudent>
 }
+

@@ -17,4 +17,8 @@ class FakePieceRepository : PieceRepository {
         return map[id] ?: throw ApplicationException(code = CodeEnum.FRS_001,"Piece not found")
     }
 
+    override fun findByTeacherIdAndPieceId(teacherId: Long, pieceId: Long): Piece {
+        return map.values.first { it.teacherId == teacherId && it.id == pieceId }
+    }
+
 }

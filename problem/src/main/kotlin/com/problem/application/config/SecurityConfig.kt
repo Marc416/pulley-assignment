@@ -15,7 +15,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 class SecurityConfig(
-    private val jwtAuthenticationFilter: JwtAuthenticationFilter
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    private val customAccessDeniedHandler: CustomAccessDeniedHandler
 ) {
 
     @Bean
@@ -44,10 +45,15 @@ class SecurityConfig(
             headers.frameOptions { it.disable() } // H2 Console의 iframe 허용
         }
 
+        http.exceptionHandling { exceptions ->
+            exceptions.accessDeniedHandler(customAccessDeniedHandler)
+        }
+
         // 권한 규칙 작성
         http.authorizeHttpRequests { authz ->
             authz
                 .requestMatchers("/piece/problems/**").hasAnyRole("STUDENT")
+                .requestMatchers("/piece/analyze").hasAnyRole("TEACHER")
                 .requestMatchers("/piece").hasAnyRole("TEACHER")
                 .anyRequest().permitAll()
         }

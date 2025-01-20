@@ -36,7 +36,7 @@ class ControllerExceptionHandler {
     @ExceptionHandler(ValidationException::class)
     fun handleValidationException(e: ValidationException): ResponseEntity<ErrorResponse> {
         logger.error { "Validation Exception occurred. message=${e.message}" }
-        logger.error{e.stackTraceToString()}
+        logger.error { e.stackTraceToString() }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(
                 ErrorResponse(
@@ -78,6 +78,19 @@ class ControllerExceptionHandler {
         return e.fieldErrors.stream()
             .map { obj: FieldError -> obj.field }
             .collect(Collectors.joining(", ")) + " 값들이 정확하지 않습니다."
+    }
+
+    @ExceptionHandler(Exception::class)
+    fun handleException(e: Exception): ResponseEntity<ErrorResponse> {
+        logger.error { "Exception occurred. message=${e.message}" }
+        logger.error { e.stackTraceToString() }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(
+                ErrorResponse(
+                    e.message ?: "알수없는 오류가 발생했습니다.",
+                    ErrorType.UNKNOWN
+                )
+            )
     }
 
 }

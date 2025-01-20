@@ -18,6 +18,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+    show-sql: true
   sql:
     init:
       schema-locations:
@@ -27,4 +28,5 @@ spring:
         - classpath:sql/piece_present_to_student.sql
         - classpath:sql/problem_detail.sql
         - classpath:sql/piece_try_history.sql
+        - classpath:sql/problem_try_history.sql
       mode: always
