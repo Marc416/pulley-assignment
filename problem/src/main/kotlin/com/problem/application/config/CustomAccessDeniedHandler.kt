@@ -25,7 +25,7 @@ class CustomAccessDeniedHandler : AccessDeniedHandler {
         )
         val jsonResponse = ObjectMapper().writeValueAsString(errorResponse)
 
-        response.status = HttpStatus.BAD_REQUEST.value()
+        response.status = HttpStatus.FORBIDDEN.value()
         response.contentType = "application/json"
         response.writer.write(jsonResponse)
         logger.error(accessDeniedException.stackTraceToString())
