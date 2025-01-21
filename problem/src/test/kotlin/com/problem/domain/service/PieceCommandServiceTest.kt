@@ -36,6 +36,17 @@ class PieceCommandServiceTest {
     }
 
     @Test
+    fun `문제지 50개 이상시 예외발생`() {
+        // Arrange
+        val pieceTitle = "문제지 제목"
+        val problemList = (1..51).map { it.toLong() }
+        val teacherId = 1L
+        // Action, Assert
+        assertThatThrownBy { pieceCommandService.create(pieceTitle, problemList, teacherId) }
+            .isInstanceOf(ApplicationException::class.java)
+    }
+
+    @Test
     fun `2인이상 학생에게 문제지 출제하기`() {
         // Arrange
         val pieceTitle = "문제지 제목"
